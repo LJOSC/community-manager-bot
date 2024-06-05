@@ -1,7 +1,8 @@
 require('dotenv').config(); // Load environment variables from .env file
-const expressApp = require('./src/app');
+import env from "./src/configs/envVars";
+import expressApp from './src/app';
 
-const PORT = process.env.EXPRESS_PORT || 3002;
+const PORT = env.EXPRESS_PORT;
 
 // Start the Express server
 expressApp.listen(PORT, () => {
@@ -11,11 +12,11 @@ expressApp.listen(PORT, () => {
 // Start the Slack app
 const { App } = require('@slack/bolt');
 const slackApp = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  token: env.SLACK_BOT_TOKEN,
+  signingSecret: env.SLACK_SIGNING_SECRET
 });
 
 (async () => {
-  await slackApp.start(process.env.PORT || 3004);
+  await slackApp.start(env.PORT);
   console.log('⚡️ Slack Bolt app is running!');
 })();

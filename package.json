@@ -2,10 +2,11 @@
   "name": "community-manager-bot",
   "version": "1.0.0",
   "description": "A slack bot to help manage LJOSC community's slack channel.",
-  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon main.js"
+    "start": "ts-node-dev --transpile-only -- index.ts",
+    "build": "tsc",
+    "ts.check": "tsc --project tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,9 @@
     "@slack/bolt": "^3.18.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
   }
 }
