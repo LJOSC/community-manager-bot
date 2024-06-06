@@ -1,18 +1,20 @@
 import express from 'express';
-import { App } from '@slack/bolt';
-import env from '../configs/envVars';
+import env from '../../configs/envVars';
+import verifyGitHubSignature from '../../middlewares/verifyGitHubSignature';
+import slackApp from 'src/configs/slack';
 
-const router = express.Router();
+const githubRouter = express.Router();
 
-const app = new App({
-  token: env.SLACK_BOT_TOKEN,
-  signingSecret: env.SLACK_SIGNING_SECRET
-});
-
-const slackChannelId = env.SLACK_CHANNEL_ID;
+githubRouter.use(
+  express.json({
+    verify: (req: express.Request & { rawBody?: Buffer }, _, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
 
 // Send a message to Slack when a user stars a GitHub repository
-router.post('/github-stars', async (req, res) => {
+githubRouter.post('/github-stars', verifyGitHubSignature, async (req, res) => {
   const event = req.body;
 
   if (event.action === 'created' && event.starred_at) {
@@ -22,9 +24,9 @@ router.post('/github-stars', async (req, res) => {
     try {
       const message = `🌟 ${user.login} starred the repository *<${repo.html_url}|${repo.full_name}>*`;
 
-      await app.client.chat.postMessage({
-        channel: slackChannelId,
-        text: message
+      await slackApp.client.chat.postMessage({
+        channel: env.SLACK_CHANNEL_ID,
+        text: message,
       });
 
       res.status(200).send('Event received');
@@ -37,4 +39,4 @@ router.post('/github-stars', async (req, res) => {
   }
 });
 
-export default router;
+export default githubRouter;
