@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --transpile-only -- src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint 'src/**/*.{js,ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{js,ts,tsx,json,md}'",
@@ -40,6 +40,7 @@
     "lint-staged": "^15.2.5",
     "prettier": "^3.3.1",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5"
   },
