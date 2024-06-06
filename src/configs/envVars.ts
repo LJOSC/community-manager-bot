@@ -8,6 +8,7 @@ if (result.error) {
 }
 
 interface EnvVars {
+  env: string;
   SLACK_BOT_TOKEN: string;
   SLACK_SIGNING_SECRET: string;
   GITHUB_WEBHOOK_SECRET: string;
@@ -17,6 +18,7 @@ interface EnvVars {
 }
 
 const env: EnvVars = {
+  env: process.env.NODE_ENV as string,
   SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN as string,
   SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET as string,
   GITHUB_WEBHOOK_SECRET: process.env.GITHUB_WEBHOOK_SECRET as string,
