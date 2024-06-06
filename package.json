@@ -4,7 +4,7 @@
   "description": "A slack bot to help manage LJOSC community's slack channel.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev -r tsconfig-paths/register --transpile-only -- src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --transpile-only -- src/index.ts",
     "build": "tsc",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "lint:fix": "eslint 'src/**/*.{js,ts,tsx}' --fix",
@@ -24,7 +24,8 @@
   "dependencies": {
     "@slack/bolt": "^3.18.0",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
