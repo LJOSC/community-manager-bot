@@ -1,13 +1,15 @@
-const express = require('express');
+import express from 'express';
+import { App } from '@slack/bolt';
+import env from '../configs/envVars';
+
 const router = express.Router();
-const { App } = require('@slack/bolt');
 
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  token: env.SLACK_BOT_TOKEN,
+  signingSecret: env.SLACK_SIGNING_SECRET
 });
 
-const slackChannelId = process.env.SLACK_CHANNEL_ID;
+const slackChannelId = env.SLACK_CHANNEL_ID;
 
 // Send a message to Slack when a user stars a GitHub repository
 router.post('/github-stars', async (req, res) => {
@@ -35,4 +37,4 @@ router.post('/github-stars', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

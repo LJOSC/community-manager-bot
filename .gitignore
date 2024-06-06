@@ -84,3 +84,7 @@ Thumbs.db
 .env
 .env.test
 .env.production
+
+# build output
+build/
+dist/

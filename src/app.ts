@@ -1,6 +1,6 @@
-const express = require('express');
-const verifyGitHubSignature = require('./middlewares/verifyGitHubSignature');
-const githubRoutes = require('./routes/github');
+import express from 'express';
+import verifyGitHubSignature from './middlewares/verifyGitHubSignature';
+import githubRoutes from './routes/github';
 
 const expressApp = express();
 
@@ -14,4 +14,4 @@ expressApp.get('/', (req, res) => {
   res.status(200).send('pong');
 });
 
-module.exports = expressApp;
+export default expressApp;

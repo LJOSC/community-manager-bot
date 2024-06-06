@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": false, // Allows unused local variables
+    "noUnusedParameters": false, // Allows unused parameters
+    "outDir": "./build"
+  },
+  "include": ["index.ts", "src"]
+}
