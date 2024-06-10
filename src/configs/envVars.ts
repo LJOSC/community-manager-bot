@@ -10,9 +10,11 @@ if (result.error) {
 interface EnvVars {
   env: string;
   SLACK_BOT_TOKEN: string;
+  SLACK_APP_TOKEN: string;
   SLACK_SIGNING_SECRET: string;
   GITHUB_WEBHOOK_SECRET: string;
-  SLACK_CHANNEL_ID: string;
+  SLACK_GITHUB_STARS_CHANNEL_ID: string;
+  SLACK_INTRODUCTIONS_CHANNEL_ID: string;
   PORT: number;
   EXPRESS_PORT: number;
 }
@@ -20,9 +22,11 @@ interface EnvVars {
 const env: EnvVars = {
   env: process.env.NODE_ENV as string,
   SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN as string,
+  SLACK_APP_TOKEN: process.env.SLACK_APP_TOKEN as string,
   SLACK_SIGNING_SECRET: process.env.SLACK_SIGNING_SECRET as string,
   GITHUB_WEBHOOK_SECRET: process.env.GITHUB_WEBHOOK_SECRET as string,
-  SLACK_CHANNEL_ID: process.env.SLACK_CHANNEL_ID as string,
+  SLACK_GITHUB_STARS_CHANNEL_ID: process.env.SLACK_GITHUB_STARS_CHANNEL_ID as string,
+  SLACK_INTRODUCTIONS_CHANNEL_ID: process.env.SLACK_INTRODUCTIONS_CHANNEL_ID as string,
   PORT: Number(process.env.PORT) || 3002,
   EXPRESS_PORT: Number(process.env.EXPRESS_PORT) || 3004,
 };
