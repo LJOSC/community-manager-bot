@@ -21,7 +21,7 @@ export async function githubStarSlackNotify(event) {
       const message = `🌟 ${user.login} starred the repository *<${repo.html_url}|${repo.full_name}>*`;
 
       await slackApp.client.chat.postMessage({
-        channel: process.env.SLACK_CHANNEL_ID as string,
+        channel: process.env.SLACK_GITHUB_STARS_CHANNEL_ID as string,
         text: message,
       });
 
