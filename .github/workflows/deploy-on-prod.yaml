@@ -6,7 +6,7 @@ on:
       - feat-prod-ci-cd
 
 env:
-  CONTAINER_NAME: community-manager-production
+  CONTAINER_NAME: community-manager-bot
   TS_SSH_USERNAME: ${{ secrets.TS_SSH_USERNAME }}
   TS_INSTANCE_IP: ${{ secrets.TS_INSTANCE_IP_STAGING }}
   TS_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
@@ -31,10 +31,10 @@ jobs:
       - name: Save Docker images to tarballs
         run: |
           mkdir -p images
-          services=$(docker-compose --services)
+          services=$(docker-compose config --services)
+          images=$(docker-compose config | grep "image:" | awk '{print $2}')
           for service in $services; do
-            image=$(docker-compose | grep "image:" | awk '{print $2}')
-            docker save $image -o images/$service.tar
+            docker save ${{env.CONTAINER_NAME}}_${service}:latest -o images/${service}.tar
           done
 
       - name: Tailscale
@@ -71,9 +71,10 @@ jobs:
           script: |
             cd ${{ env.PROJECT_PATH }}
             mkdir -p images
-            rm -rf images/* || true
             for tar in images/*.tar; do
-              docker load -i $tar
+            docker load -i $tar
             done
+            rm -rf images/* || true
             docker-compose down
             docker-compose up -d
+            docker image prune -f
