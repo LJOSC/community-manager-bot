@@ -25,6 +25,7 @@ jobs:
       - name: Build, tag, and save docker image
         id: build-image
         run: |
+          touch .env
           docker-compose build
           
       - name: Save Docker images to tarballs
