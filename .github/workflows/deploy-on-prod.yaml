@@ -36,6 +36,7 @@ jobs:
           for service in $services; do
             docker save ${{env.CONTAINER_NAME}}_${service}:latest -o images/${service}.tar
           done
+          chmod -R 666 images
 
       - name: Tailscale
         uses: tailscale/github-action@v2
