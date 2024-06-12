@@ -40,7 +40,9 @@ jobs:
       - name: Set permissions for images directory
         run: |
           sudo chown -R $USER:$USER images
+          sudo chown -R $USER:$USER docker-compose.yml
           sudo chmod -R 755 images
+          sudo chmod -R 755 docker-compose.yml
 
       - name: Tailscale
         uses: tailscale/github-action@v2
@@ -56,7 +58,7 @@ jobs:
           username: ${{ env.TS_SSH_USERNAME }}
           key: ${{ env.TS_SSH_PRIVATE_KEY }}
           source: "images/*.tar"
-          target: ${{ env.PROJECT_PATH }}/images/
+          target: ${{ env.PROJECT_PATH }}/images
       
       - name: copy docker-compose file to remote server
         uses: appleboy/scp-action@v0.1.7
