@@ -36,7 +36,11 @@ jobs:
           for service in $services; do
             docker save ${{env.CONTAINER_NAME}}_${service}:latest -o images/${service}.tar
           done
-          sudo chmod -R 666 images
+
+      - name: Set permissions for images directory
+        run: |
+          sudo chown -R $USER:$USER images
+          sudo chmod -R 755 images
 
       - name: Tailscale
         uses: tailscale/github-action@v2
