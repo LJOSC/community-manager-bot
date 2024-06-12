@@ -1,0 +1,78 @@
+name: Deploy on tailscale prod server
+
+on:
+  push:
+    branches:
+      - feat-prod-ci-cd
+
+env:
+  CONTAINER_NAME: community-manager-production
+  TS_SSH_USERNAME: ${{ secrets.TS_SSH_USERNAME }}
+  TS_INSTANCE_IP: ${{ secrets.TS_INSTANCE_IP_STAGING }}
+  TS_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+  PROJECT_PATH: ${{ secrets.PROJECT_PATH_STAGING }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build, tag, and save docker image
+        id: build-image
+        run: |
+          docker-compose build
+          
+      - name: Save Docker images to tarballs
+        run: |
+          mkdir -p images
+          services=$(docker-compose --services)
+          for service in $services; do
+            image=$(docker-compose | grep "image:" | awk '{print $2}')
+            docker save $image -o images/$service.tar
+          done
+
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+            oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+            oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+            tags: tag:ci
+
+      - name: copy exported docker images to remote server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.TS_INSTANCE_IP }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.TS_SSH_PRIVATE_KEY }}
+          source: "images/*.tar"
+          target: ${{ env.PROJECT_PATH }}/images/
+      
+      - name: copy docker-compose file to remote server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.TS_INSTANCE_IP }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.TS_SSH_PRIVATE_KEY }}
+          source: "docker-compose.yml"
+          target: ${{ env.PROJECT_PATH }}/docker-compose.yml
+
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.TS_INSTANCE_IP }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.TS_SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ env.PROJECT_PATH }}
+            mkdir -p images
+            rm -rf images/* || true
+            for tar in images/*.tar; do
+              docker load -i $tar
+            done
+            docker-compose down
+            docker-compose up -d
