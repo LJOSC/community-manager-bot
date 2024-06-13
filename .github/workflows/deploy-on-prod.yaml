@@ -40,9 +40,9 @@ jobs:
       - name: Set permissions for images directory
         run: |
           sudo chown -R $USER:$USER images
-          sudo chown -R $USER:$USER docker-compose.yaml
+          sudo chown $USER:$USER docker-compose.yaml
           sudo chmod -R 755 images
-          sudo chmod -R 755 docker-compose.yaml
+          sudo chmod 755 docker-compose.yaml
 
       - name: Tailscale
         uses: tailscale/github-action@v2
@@ -67,7 +67,7 @@ jobs:
           host: ${{ env.TS_INSTANCE_IP }}
           username: ${{ env.TS_SSH_USERNAME }}
           key: ${{ env.TS_SSH_PRIVATE_KEY }}
-          source: "docker-compose.yaml"
+          source: "./docker-compose.yaml"
           target: ${{ env.PROJECT_PATH }}/
           overwrite: true
 
