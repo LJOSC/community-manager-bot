@@ -60,11 +60,6 @@ jobs:
           source: "images/*.tar"
           target: ${{ env.PROJECT_PATH }}/
           overwrite: true
-
-      - name: debug
-        run: |
-          ls -la
-          ls -la docker-compose.yaml || true
       
       - name: copy docker-compose file to remote server
         uses: appleboy/scp-action@v0.1.7
