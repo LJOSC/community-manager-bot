@@ -59,6 +59,7 @@ jobs:
           key: ${{ env.TS_SSH_PRIVATE_KEY }}
           source: "images/*.tar"
           target: ${{ env.PROJECT_PATH }}/
+          overwrite: true
       
       - name: copy docker-compose file to remote server
         uses: appleboy/scp-action@v0.1.7
@@ -68,6 +69,7 @@ jobs:
           key: ${{ env.TS_SSH_PRIVATE_KEY }}
           source: "docker-compose.yaml"
           target: ${{ env.PROJECT_PATH }}/
+          overwrite: true
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3
