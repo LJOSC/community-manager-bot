@@ -1,0 +1,89 @@
+name: Deploy on tailscale prod server
+
+on:
+  push:
+    branches:
+      - release
+
+env:
+  CONTAINER_NAME: community-manager-bot
+  TS_SSH_USERNAME: ${{ secrets.TS_SSH_USERNAME }}
+  TS_INSTANCE_IP_STAGING: ${{ secrets.TS_INSTANCE_IP_STAGING }}
+  SSH_PRIVATE_KEY_STAGING: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+  PROJECT_PATH_STAGING: ${{ secrets.PROJECT_PATH_STAGING }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build, tag, and save docker image
+        id: build-image
+        run: |
+          touch .env
+          docker-compose build
+          
+      - name: Save Docker images to tarballs
+        run: |
+          mkdir -p images
+          services=$(docker-compose config --services)
+          images=$(docker-compose config | grep "image:" | awk '{print $2}')
+          for service in $services; do
+            docker save ${{env.CONTAINER_NAME}}_${service}:latest -o images/${service}.tar
+          done
+
+      - name: Set permissions for images directory
+        run: |
+          sudo chown -R $USER:$USER images
+          sudo chown $USER:$USER docker-compose.yaml
+          sudo chmod -R 755 images
+          sudo chmod 755 docker-compose.yaml
+
+      - name: Tailscale
+        uses: tailscale/github-action@v2
+        with:
+            oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+            oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+            tags: tag:ci
+
+      - name: copy exported docker images to remote server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.TS_INSTANCE_IP_STAGING }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY_STAGING }}
+          source: "images/*.tar"
+          target: ${{ env.PROJECT_PATH_STAGING }}/
+          overwrite: true
+      
+      - name: copy docker-compose file to remote server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.TS_INSTANCE_IP_STAGING }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY_STAGING }}
+          source: "docker-compose.yaml"
+          target: ${{ env.PROJECT_PATH_STAGING }}/
+          overwrite: true
+
+      - name: Recreate docker container with new image
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.TS_INSTANCE_IP_STAGING }}
+          username: ${{ env.TS_SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY_STAGING }}
+          script: |
+            cd ${{ env.PROJECT_PATH_STAGING }}
+            mkdir -p images
+            for tar in images/*.tar; do
+            docker load -i $tar
+            done
+            rm -rf images/* || true
+            docker-compose down
+            docker-compose up -d
+            docker image prune -f
